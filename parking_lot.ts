@@ -1,32 +1,39 @@
-export class ParkingLot {
-  public occupied: number = 0;
+export interface Publisher {
+	enter(): number;
+	exit(): number;
+	occupied: number;
+	name: string;
+}
 
-  constructor(
-    public name: string,
-    public capacity: number,
-  ) {}
+export class ParkingLot implements Publisher {
+	public occupied: number = 0;
 
-  enter() {
-    if (!this.isFull()) {
-      this.occupied++;
-    } else {
-      throw new Error(`the parking lot is full`);
-    }
-  }
+	constructor(
+		public name: string,
+		public capacity: number,
+	) {}
 
-  exit() {
-    if (!this.isEmpty()) {
-      this.occupied--;
-    } else {
-      throw new Error(`the parking lot is empty`);
-    }
-  }
+	enter(): number {
+		if (!this.isFull()) {
+			return ++this.occupied;
+		} else {
+			throw new Error(`the parking lot is full`);
+		}
+	}
 
-  isFull() {
-    return this.occupied == this.capacity;
-  }
+	exit(): number {
+		if (!this.isEmpty()) {
+			return --this.occupied;
+		} else {
+			throw new Error(`the parking lot is empty`);
+		}
+	}
 
-  isEmpty() {
-    return this.occupied == 0;
-  }
+	isFull() {
+		return this.occupied == this.capacity;
+	}
+
+	isEmpty() {
+		return this.occupied == 0;
+	}
 }
