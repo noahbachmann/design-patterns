@@ -1,8 +1,12 @@
 export interface Publisher {
-	enter(): number;
-	exit(): number;
-	occupied: number;
-	name: string;
+	enter(): void;
+	exit(): void;
+	subscribe(subscriber: Subscriber): void;
+	subscribers: Subscriber[];
+}
+
+export interface Subscriber {
+	log(message: string): void;
 }
 
 export class ParkingLot implements Publisher {
@@ -11,19 +15,22 @@ export class ParkingLot implements Publisher {
 	constructor(
 		public name: string,
 		public capacity: number,
+		public subscribers: Subscriber[] = [],
 	) {}
 
-	enter(): number {
+	enter() {
 		if (!this.isFull()) {
-			return ++this.occupied;
+			++this.occupied;
+			this.subscribers.forEach((sub) => sub.log(this.stringifyMessage(true)));
 		} else {
 			throw new Error(`the parking lot is full`);
 		}
 	}
 
-	exit(): number {
+	exit() {
 		if (!this.isEmpty()) {
-			return --this.occupied;
+			--this.occupied;
+			this.subscribers.forEach((sub) => sub.log(this.stringifyMessage(false)));
 		} else {
 			throw new Error(`the parking lot is empty`);
 		}
@@ -35,5 +42,14 @@ export class ParkingLot implements Publisher {
 
 	isEmpty() {
 		return this.occupied == 0;
+	}
+
+	private stringifyMessage(enter: boolean): string {
+		return `A car ${enter ? "entered" : "left"} the lot ${this.name}: ${this.occupied}/${this.capacity} occupied`;
+	}
+
+	subscribe(subscriber: Subscriber) {
+		this.subscribers.push(subscriber);
+		subscriber.log(`${this.name}: ${this.occupied}/${this.capacity} occupied`);
 	}
 }

@@ -1,16 +1,14 @@
-import { Publisher } from "./parking_lot.ts";
-
-export interface Subscriber {
-	log(enter: boolean): string;
-}
+import { Publisher, Subscriber } from "./parking_lot.ts";
 
 export class Display implements Subscriber {
-	publisher: Publisher;
-	constructor(pb: Publisher) {
-		this.publisher = pb;
+	constructor(
+		pb: Publisher,
+		public name: string,
+	) {
+		pb.subscribe(this);
 	}
 
-	log(enter: boolean): string {
-		return `A car ${enter ? "entered" : "left"} the lot ${this.publisher.name}: ${this.publisher.occupied}`;
+	log(message: string) {
+		console.log(this.name + ": " + message);
 	}
 }
