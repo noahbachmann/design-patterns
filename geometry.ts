@@ -13,7 +13,7 @@ export class Square extends Rectangle implements Quadratic {
 		super(width, height);
 	}
 
-	public toString(): string {
+	override toString(): string {
 		return `Square(${this.side})`;
 	}
 
