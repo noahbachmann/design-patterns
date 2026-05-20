@@ -2,31 +2,27 @@ import { CleanSaved, CleanUnsaved, State } from "./state.ts";
 
 export class Editor {
 	state: State = new CleanUnsaved();
-	openFile: string = "";
+	openFileName: string = "";
 	textArea: HTMLTextAreaElement = document.getElementById(
 		"text",
 	) as HTMLTextAreaElement;
 
 	handleInput() {
-		this.state = this.state.handleAreaInput(this);
+		this.state.handleAreaInput(this);
 	}
 
 	handleSaveAsClick() {
-		let filename = prompt("Enter a File Name", "");
-		if (filename?.trim() != "") {
-			if (!filename?.endsWith(".txt")) {
-				filename = filename + ".txt";
-			}
-			localStorage.setItem(filename, this.textArea.value);
-			this.state = new CleanUnsaved();
-			this.openFile = filename;
-			this.setStateLabel(filename);
-			this.showFiles("files-list");
-		}
+		const filename = Editor.getFilenameInput();
+
+		localStorage.setItem(filename, this.textArea.value);
+		this.state = new CleanSaved();
+		this.openFileName = filename;
+		this.setStateLabel(filename);
+		this.showFiles("files-list");
 	}
 
 	handleSaveClick() {
-		const filename = this.state.handleSaveClick(this.openFile);
+		const filename = this.state.handleSaveClick() ?? this.openFileName;
 
 		localStorage.setItem(filename, this.textArea.value);
 		this.setStateLabel(filename);
@@ -37,7 +33,7 @@ export class Editor {
 
 	handleNewClick() {
 		this.textArea.value = "";
-		this.openFile = "";
+		this.openFileName = "";
 		this.setStateLabel("_");
 		this.state = new CleanUnsaved();
 	}
@@ -66,7 +62,7 @@ export class Editor {
 
 			link.addEventListener("click", () => {
 				const content = localStorage.getItem(file);
-				this.openFile = file;
+				this.openFileName = file;
 				if (this.textArea != null) {
 					this.textArea.value = content || "";
 				}
@@ -82,5 +78,17 @@ export class Editor {
 			files.push(localStorage.key(i) || "");
 		}
 		return files;
+	}
+
+	public static getFilenameInput(): string {
+		let filename;
+		do {
+			filename = prompt("Enter a File Name", "");
+		} while (filename?.trim() == "");
+
+		if (!filename?.endsWith(".txt")) {
+			filename = filename + ".txt";
+		}
+		return filename;
 	}
 }

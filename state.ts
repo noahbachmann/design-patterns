@@ -1,64 +1,44 @@
 import { Editor } from "./editor.ts";
 
 export interface State {
-	handleAreaInput(editor: Editor): State;
-	handleSaveClick(openFile?: string): string;
+	handleAreaInput(editor: Editor): void;
+	handleSaveClick(): string | null;
 }
 
 export class CleanSaved implements State {
-	handleAreaInput(editor: Editor): State {
-		editor.setStateLabel(`${editor.openFile} *`);
-		return new DirtySaved();
+	handleAreaInput(editor: Editor) {
+		editor.setStateLabel(`${editor.openFileName} *`);
+		editor.state = new DirtySaved();
 	}
 
-	handleSaveClick(openFile: string): string {
-		return openFile;
+	handleSaveClick(): null {
+		return null;
 	}
 }
 
 export class CleanUnsaved implements State {
-	handleAreaInput(editor: Editor): State {
+	handleAreaInput(editor: Editor) {
 		editor.setStateLabel("*");
-		return new DirtyUnsaved();
+		editor.state = new DirtyUnsaved();
 	}
 
 	handleSaveClick(): string {
-		let filename;
-		do {
-			filename = prompt("Enter a File Name", "");
-		} while (filename?.trim() == "");
-
-		if (!filename?.endsWith(".txt")) {
-			filename = filename + ".txt";
-		}
-		return filename;
+		return Editor.getFilenameInput();
 	}
 }
 
 export class DirtySaved implements State {
-	handleAreaInput(): State {
-		return this;
-	}
+	handleAreaInput() {}
 
-	handleSaveClick(openFile: string): string {
-		return openFile;
+	handleSaveClick(): null {
+		return null;
 	}
 }
 
 export class DirtyUnsaved implements State {
-	handleAreaInput(): State {
-		return this;
-	}
+	handleAreaInput() {}
 
 	handleSaveClick(): string {
-		let filename;
-		do {
-			filename = prompt("Enter a File Name", "");
-		} while (filename?.trim() == "");
-
-		if (!filename?.endsWith(".txt")) {
-			filename = filename + ".txt";
-		}
-		return filename;
+		return Editor.getFilenameInput();
 	}
 }
